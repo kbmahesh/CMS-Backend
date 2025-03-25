@@ -5,6 +5,7 @@ import FeeType from "../models/FeeType.js";
 import User from "../models/User.js";
 import Fee from "../models/Fee.js"
 import Transaction from "../models/Transaction.js"
+import FeeType from "../models/FeeType.js";
 
 const router = express.Router();
 // API to fetch branches based on selected course
@@ -72,6 +73,9 @@ router.post("/register-student", async (req, res) => {
 
         // Generate default password
         const generateDefaultPassword = (first_name, last_name, dob) => {
+            // Extract the first 4 letters of first_name (or full name if less than 4 characters)
+            const firstPart = first_name.substring(0, 4);
+
             // Extract birth year from DOB (assuming format "YYYY-MM-DD")
             const birthYear = dob.split("-")[0];
         
@@ -79,7 +83,7 @@ router.post("/register-student", async (req, res) => {
             const lastInitial = last_name.charAt(0).toUpperCase();
         
             // Generate default password (e.g., "John@D2000")
-            return `${first_name}@${lastInitial}${birthYear}`;
+            return `${firstPart}@${lastInitial}${birthYear}`;
         };
         
         const defaultPassword = generateDefaultPassword(first_name,last_name,dob);
@@ -245,7 +249,7 @@ router.post("/addfees", async (req, res) => {
 
         // ✅ Create and Save Fee in `Fee` Collection
         const newFee = new Fee({
-            student_id: student._id,
+            student_id: student.student_id,
             academic_year: new Date().getFullYear().toString(), // Current academic year
             fee_type: fee_category,
             total_fees: amount,
